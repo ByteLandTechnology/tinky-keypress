@@ -1,3 +1,9 @@
+## [1.0.1](https://github.com/ByteLandTechnology/tinky-keypress/compare/v1.0.0...v1.0.1) (2026-01-18)
+
+### 📦 Build
+
+- install conventional-changelog dependencies and fix changelog format ([939bc80](https://github.com/ByteLandTechnology/tinky-keypress/commit/939bc803b57e9c29fcf7aee1d58f33756932b9fb))
+
 ## 1.0.0 (2026-01-18)
 
 - ci: add release workflow ([7d48f4f](https://github.com/ByteLandTechnology/tinky-keypress/commit/7d48f4f))
