@@ -24,7 +24,8 @@
     "declaration": true,
     "pretty": true,
     "jsx": "react-jsx",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "skipLibCheck": true
   },
   "include": ["typings/**/*", "src/**/*"]
 }

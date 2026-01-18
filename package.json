@@ -1,43 +1,42 @@
 {
-  "name": "tinky",
+  "name": "tinky-keypress",
   "version": "0.1.0",
-  "description": "React for CLIs, re-imagined with the Taffy engine",
+  "description": "Keypress handling context and hooks for Tinky",
   "keywords": [
+    "tinky",
     "react",
-    "ink",
-    "taffy",
     "cli",
     "terminal",
-    "layout-engine",
-    "flexbox",
-    "grid",
-    "renderer"
+    "keypress",
+    "input",
+    "keyboard",
+    "stdin",
+    "tui"
   ],
-  "homepage": "https://github.com/ByteLandTechnology/tinky#readme",
+  "homepage": "https://github.com/ByteLandTechnology/tinky-keypress#readme",
   "bugs": {
-    "url": "https://github.com/ByteLandTechnology/tinky/issues"
+    "url": "https://github.com/ByteLandTechnology/tinky-keypress/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ByteLandTechnology/tinky.git"
+    "url": "git+https://github.com/ByteLandTechnology/tinky-keypress.git"
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": {
     "name": "ByteLandTechnology"
   },
   "type": "module",
   "main": "./lib/index.js",
   "scripts": {
-    "test": "tsc",
+    "test": "bun test",
     "build": "tsc && npm run docs",
     "lint": "eslint src tests",
     "prepublish": "npm run build",
     "prepare": "husky",
     "docs": "typedoc --plugin typedoc-plugin-markdown --disableSources --out docs/api && prettier --write docs/api"
   },
-  "dependencies": {
-    "tslint": "^5.20.1",
-    "typescript": "^5.9.3"
+  "peerDependencies": {
+    "tinky": "^1.1.2"
   },
   "files": [
     "./bin/*",
@@ -51,6 +50,7 @@
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/github": "^12.0.0",
     "@semantic-release/npm": "^13.1.3",
+    "@types/bun": "^1.3.6",
     "eslint": "^9.39.2",
     "eslint-plugin-react": "^7.37.5",
     "husky": "^9.1.7",
