@@ -61,27 +61,13 @@
             "scope": "release",
             "release": false
           }
-        ],
-        "parserOpts": {
-          "noteKeywords": [
-            "BREAKING CHANGE",
-            "BREAKING-CHANGE",
-            "BREAKING CHANGES"
-          ]
-        }
+        ]
       }
     ],
     [
       "@semantic-release/release-notes-generator",
       {
         "preset": "conventionalcommits",
-        "parserOpts": {
-          "noteKeywords": [
-            "BREAKING CHANGE",
-            "BREAKING-CHANGE",
-            "BREAKING CHANGES"
-          ]
-        },
         "presetConfig": {
           "types": [
             {
