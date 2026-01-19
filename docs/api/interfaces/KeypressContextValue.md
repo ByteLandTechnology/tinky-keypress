@@ -6,7 +6,8 @@
 
 # Interface: KeypressContextValue
 
-Keypress Context and Provider
+Interface defining the shape of the Keypress context value.
+Used for subscribing to and unsubscribing from keypress events.
 
 ## Properties
 
@@ -14,11 +15,15 @@ Keypress Context and Provider
 
 > **subscribe**: (`handler`) => `void`
 
+Registers a handler function to be called when a keypress event occurs.
+
 #### Parameters
 
 ##### handler
 
 [`KeypressHandler`](../type-aliases/KeypressHandler.md)
+
+The function to call with the parsed Key object.
 
 #### Returns
 
@@ -30,11 +35,15 @@ Keypress Context and Provider
 
 > **unsubscribe**: (`handler`) => `void`
 
+Unregisters a previously registered handler function.
+
 #### Parameters
 
 ##### handler
 
 [`KeypressHandler`](../type-aliases/KeypressHandler.md)
+
+The handler function to remove.
 
 #### Returns
 

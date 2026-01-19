@@ -12,11 +12,27 @@ import {
 
 export type { Key, KeypressHandler };
 
+/**
+ * Interface defining the shape of the Keypress context value.
+ * Used for subscribing to and unsubscribing from keypress events.
+ */
 export interface KeypressContextValue {
+  /**
+   * Registers a handler function to be called when a keypress event occurs.
+   * @param handler - The function to call with the parsed Key object.
+   */
   subscribe: (handler: KeypressHandler) => void;
+  /**
+   * Unregisters a previously registered handler function.
+   * @param handler - The handler function to remove.
+   */
   unsubscribe: (handler: KeypressHandler) => void;
 }
 
+/**
+ * React Context for handling keypress events.
+ * Provides mechanisms to subscribe to global key input events processed from stdin.
+ */
 export const KeypressContext = createContext<KeypressContextValue | undefined>(
   undefined,
 );
