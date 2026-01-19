@@ -1,3 +1,17 @@
+## [1.2.0](https://github.com/ByteLandTechnology/tinky-keypress/compare/v1.1.0...v1.2.0) (2026-01-19)
+
+### ✨ Features
+
+- add platform awareness to keypress handling and update tinky dependency ([5feff13](https://github.com/ByteLandTechnology/tinky-keypress/commit/5feff13115863d785940f6f7fce48a1591138b58))
+
+### ♻️ Refactoring
+
+- extract keypress logic and sequences to utils ([ceb81f6](https://github.com/ByteLandTechnology/tinky-keypress/commit/ceb81f6329e5b52784b54a765d5d4ab3b3985e6f))
+
+### 📚 Documentation
+
+- add TSDoc to KeypressContext and KeypressContextValue ([1f027d4](https://github.com/ByteLandTechnology/tinky-keypress/commit/1f027d487b28254e65ac7faaa172c57a2049d074))
+
 ## [1.0.2](https://github.com/ByteLandTechnology/tinky-keypress/compare/v1.0.1...v1.0.2) (2026-01-19)
 
 ### 📦 Build
