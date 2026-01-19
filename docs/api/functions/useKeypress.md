@@ -1,8 +1,8 @@
-[**tinky**](../README.md)
+[**tinky-keypress**](../README.md)
 
 ---
 
-[tinky](../globals.md) / useKeypress
+[tinky-keypress](../globals.md) / useKeypress
 
 # Function: useKeypress()
 

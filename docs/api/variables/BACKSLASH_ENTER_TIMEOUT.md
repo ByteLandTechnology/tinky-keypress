@@ -1,8 +1,8 @@
-[**tinky**](../README.md)
+[**tinky-keypress**](../README.md)
 
 ---
 
-[tinky](../globals.md) / BACKSLASH_ENTER_TIMEOUT
+[tinky-keypress](../globals.md) / BACKSLASH_ENTER_TIMEOUT
 
 # Variable: BACKSLASH_ENTER_TIMEOUT
 

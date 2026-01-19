@@ -1,8 +1,8 @@
-[**tinky**](../README.md)
+[**tinky-keypress**](../README.md)
 
 ---
 
-[tinky](../globals.md) / Key
+[tinky-keypress](../globals.md) / Key
 
 # Interface: Key
 

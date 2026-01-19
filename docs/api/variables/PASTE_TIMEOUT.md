@@ -1,8 +1,8 @@
-[**tinky**](../README.md)
+[**tinky-keypress**](../README.md)
 
 ---
 
-[tinky](../globals.md) / PASTE_TIMEOUT
+[tinky-keypress](../globals.md) / PASTE_TIMEOUT
 
 # Variable: PASTE_TIMEOUT
 

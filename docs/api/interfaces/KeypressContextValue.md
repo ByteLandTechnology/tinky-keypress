@@ -1,8 +1,8 @@
-[**tinky**](../README.md)
+[**tinky-keypress**](../README.md)
 
 ---
 
-[tinky](../globals.md) / KeypressContextValue
+[tinky-keypress](../globals.md) / KeypressContextValue
 
 # Interface: KeypressContextValue
 

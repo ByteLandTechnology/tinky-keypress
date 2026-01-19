@@ -1,8 +1,8 @@
-[**tinky**](../README.md)
+[**tinky-keypress**](../README.md)
 
 ---
 
-[tinky](../globals.md) / FOCUS_IN
+[tinky-keypress](../globals.md) / FOCUS_IN
 
 # Variable: FOCUS_IN
 

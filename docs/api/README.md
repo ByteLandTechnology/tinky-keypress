@@ -1,51 +1,70 @@
-**tinky**
+**tinky-keypress**
 
 ---
 
 # tinky-keypress
 
-Keypress handling for [Tinky](https://github.com/ByteLandTechnology/tinky), a React-based TUI framework.
+[简体中文](_media/README.zh-CN.md) | [日本語](_media/README.ja-JP.md)
 
-This package provides a context provider and hooks to handle keyboard input in your terminal applications. It supports standard keys, modifier combinations (Ctrl, Alt/Meta, Shift), and can handle escape sequences including mouse support (via `tinky-mouse` integration context) and clipboard operations.
+> Robust keypress handling and input parsing for [Tinky](https://github.com/ByteLandTechnology/tinky) applications.
+
+This package provides a dedicated context and hooks system for managing standard input (stdin) in terminal user interfaces. It handles the complexity of parsing raw ANSI escape sequences, including special keys, modifiers, and modern terminal protocols.
+
+## Features
+
+- **Easy Integration**: Drop-in context provider (`KeypressProvider`) and hook (`useKeypress`).
+- **Comprehensive Parsing**: Supports standard keys, function keys (F1-F12), navigation keys, and more.
+- **Modifier Support**: Handles Control, Alt/Meta, and Shift modifiers.
+- **Advanced Protocols**: Optional support for the Kitty Keyboard Protocol.
+- **Mouse & Clipboard**: Built-in filtering for mouse events and support for OSC 52 paste sequences.
+- **Type-Safe**: Written in TypeScript with complete type definitions.
 
 ## Installation
 
 ```bash
 npm install tinky-keypress
+# or
+yarn add tinky-keypress
+# or
+pnpm add tinky-keypress
+# or
+bun add tinky-keypress
 ```
 
 ## Usage
 
-Wrap your application (or part of it) with `KeypressProvider` and use the `useKeypress` hook to listen for key events.
+Wrap your application root with `KeypressProvider` and use `useKeypress` in any child component.
 
 ```tsx
 import React, { useState } from "react";
 import { render, Text } from "tinky";
 import { KeypressProvider, useKeypress } from "tinky-keypress";
 
-const App = () => {
-  const [lastPress, setLastPress] = useState("None");
+function App() {
+  const [lastEvent, setLastEvent] = useState<string>("Press any key...");
 
   useKeypress(
     (key) => {
-      setLastPress(`${key.name} (sequence: ${JSON.stringify(key.sequence)})`);
+      const parts = [key.name];
+      if (key.ctrl) parts.push("Ctrl");
+      if (key.meta) parts.push("Alt");
+      if (key.shift) parts.push("Shift");
 
-      if (key.name === "q") {
+      setLastEvent(
+        `Detected: ${parts.join("+")} (Sequence: ${JSON.stringify(key.sequence)})`,
+      );
+
+      if (key.name === "q" && !key.ctrl) {
         process.exit(0);
       }
     },
     { isActive: true },
   );
 
-  return (
-    <>
-      <Text>Press any key (q to exit)</Text>
-      <Text>Last Key: {lastPress}</Text>
-    </>
-  );
-};
+  return <Text>{lastEvent}</Text>;
+}
 
-render(
+const instance = render(
   <KeypressProvider>
     <App />
   </KeypressProvider>,
@@ -54,46 +73,41 @@ render(
 
 ## API
 
-### Components
+### `<KeypressProvider />`
 
-#### `<KeypressProvider />`
+The top-level provider that listens to `process.stdin`.
 
-Context provider that manages stdin `data` events, parses escape sequences, and broadcasts key events to subscribers.
+| Prop            | Type        | Default | Description                                                                    |
+| --------------- | ----------- | ------- | ------------------------------------------------------------------------------ |
+| `children`      | `ReactNode` | N/A     | Child components that can use keypress hooks.                                  |
+| `kittyProtocol` | `boolean`   | `false` | Enable support for the Kitty keyboard protocol (if supported by the terminal). |
 
-**Props:**
+### `useKeypress(handler, options)`
 
-- `children`: React nodes.
-- `kittyProtocol`: (Optional) Boolean to enable Kitty keyboard protocol parsing support (if enabled in terminal).
+Hook to subscribe to keypress events.
 
-### Hooks
+```typescript
+useKeypress(
+  handler: (key: Key) => void,
+  options: { isActive: boolean }
+): void
+```
 
-#### `useKeypress(handler, options)`
+- **handler**: Function called whenever a keypress occurs.
+- **options.isActive**: Boolean to enable or disable the listener (useful for focus management).
 
-Subscribe to keypress events.
+### `Key` Interface
 
-**Parameters:**
-
-- `handler`: Implementation of `KeypressHandler`. Called with a `Key` object.
-- `options`: `{ isActive: boolean }`. Pass `isActive: true` to enable the listener.
-
-#### `useKeypressContext()`
-
-Access the underlying context subscriber methods directly (`subscribe`, `unsubscribe`).
-
-### Types
-
-#### `Key`
-
-Object representing a parsed keypress.
+The event object passed to the handler:
 
 ```typescript
 interface Key {
-  name: string; // e.g. "a", "return", "backspace", "up"
-  ctrl: boolean; // true if Ctrl key was pressed
-  meta: boolean; // true if Alt/Meta key was pressed
-  shift: boolean; // true if Shift key was pressed
-  insertable: boolean; // true if the key produces a printable character
-  sequence: string; // The raw escape sequence or character
+  name: string; // The name of the key (e.g., 'a', 'enter', 'escape', 'up')
+  ctrl: boolean; // Whether the Control key is pressed
+  meta: boolean; // Whether the Alt/Meta key is pressed
+  shift: boolean; // Whether the Shift key is pressed
+  insertable: boolean; // Whether the key produces a printable character
+  sequence: string; // The raw ANSI sequence received
 }
 ```
 

@@ -1,8 +1,8 @@
-[**tinky**](../README.md)
+[**tinky-keypress**](../README.md)
 
 ---
 
-[tinky](../globals.md) / ESC_TIMEOUT
+[tinky-keypress](../globals.md) / ESC_TIMEOUT
 
 # Variable: ESC_TIMEOUT
 

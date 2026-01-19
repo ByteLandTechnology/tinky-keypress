@@ -1,8 +1,8 @@
-[**tinky**](../README.md)
+[**tinky-keypress**](../README.md)
 
 ---
 
-[tinky](../globals.md) / FAST_RETURN_TIMEOUT
+[tinky-keypress](../globals.md) / FAST_RETURN_TIMEOUT
 
 # Variable: FAST_RETURN_TIMEOUT
 

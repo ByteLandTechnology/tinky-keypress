@@ -1,8 +1,8 @@
-[**tinky**](../README.md)
+[**tinky-keypress**](../README.md)
 
 ---
 
-[tinky](../globals.md) / KeypressProvider
+[tinky-keypress](../globals.md) / KeypressProvider
 
 # Function: KeypressProvider()
 

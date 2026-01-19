@@ -1,8 +1,8 @@
-[**tinky**](../README.md)
+[**tinky-keypress**](../README.md)
 
 ---
 
-[tinky](../globals.md) / KeypressHandler
+[tinky-keypress](../globals.md) / KeypressHandler
 
 # Type Alias: KeypressHandler()
 

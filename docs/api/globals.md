@@ -1,8 +1,8 @@
-[**tinky**](README.md)
+[**tinky-keypress**](README.md)
 
 ---
 
-# tinky
+# tinky-keypress
 
 ## Interfaces
 
