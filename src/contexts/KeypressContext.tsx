@@ -6,7 +6,7 @@ import {
   useEffect,
   useRef,
 } from "react";
-import { useStdin } from "tinky";
+import { useApp, useStdin, useStdout } from "tinky";
 
 // ESC character constant (escape key)
 const ESC = "\x1b";
@@ -280,17 +280,24 @@ function bufferPaste(keypressHandler: KeypressHandler): KeypressHandler {
  * Buffers escape sequences until a full sequence is received or
  * until a timeout occurs.
  */
-function createDataListener(keypressHandler: KeypressHandler) {
-  const parser = emitKeys(keypressHandler);
+function createDataListener(
+  keypressHandler: KeypressHandler,
+  platform?: string,
+) {
+  const parser = emitKeys(keypressHandler, platform);
   parser.next(); // prime the generator so it starts listening.
 
-  let timeoutId: NodeJS.Timeout;
-  return (data: string) => {
+  let timeoutId: Timer;
+  return (data: unknown) => {
+    if (typeof data !== "string" && !Buffer.isBuffer(data)) {
+      return;
+    }
+    const input = typeof data === "string" ? data : data.toString("utf8");
     clearTimeout(timeoutId);
-    for (const char of data) {
+    for (const char of input) {
       parser.next(char);
     }
-    if (data.length !== 0) {
+    if (input.length !== 0) {
       timeoutId = setTimeout(() => parser.next(""), ESC_TIMEOUT);
     }
   };
@@ -303,6 +310,7 @@ function createDataListener(keypressHandler: KeypressHandler) {
  */
 function* emitKeys(
   keypressHandler: KeypressHandler,
+  platform?: string,
 ): Generator<void, void, string> {
   while (true) {
     let ch = yield;
@@ -564,7 +572,7 @@ function* emitKeys(
       shift = /^[A-Z]$/.exec(ch) !== null;
       meta = escaped;
       insertable = true;
-    } else if (MAC_ALT_KEY_CHARACTER_MAP[ch] && process.platform === "darwin") {
+    } else if (MAC_ALT_KEY_CHARACTER_MAP[ch] && platform === "darwin") {
       name = MAC_ALT_KEY_CHARACTER_MAP[ch];
       meta = true;
     } else if (sequence === `${ESC}${ESC}`) {
@@ -663,7 +671,9 @@ export function KeypressProvider({
   /** Whether Kitty keyboard protocol is enabled (from useTermcap) */
   kittyProtocol?: boolean;
 }) {
-  const { stdin } = useStdin();
+  const { stdin, setRawMode, isRawModeSupported } = useStdin();
+  const { stdout } = useStdout();
+  const { platform } = useApp();
 
   const subscribers = useRef<Set<KeypressHandler>>(new Set()).current;
   const subscribe = useCallback(
@@ -680,7 +690,12 @@ export function KeypressProvider({
   );
 
   useEffect(() => {
-    process.stdin.setEncoding("utf8"); // Make data events emit strings
+    if (isRawModeSupported) {
+      setRawMode(true);
+    }
+
+    // Enable Bracketed Paste Mode
+    stdout.write("\x1b[?2004h");
 
     let processor = nonKeyboardEventFilter(broadcast);
     if (!kittyProtocol) {
@@ -688,16 +703,18 @@ export function KeypressProvider({
     }
     processor = bufferBackslashEnter(processor);
     processor = bufferPaste(processor);
-    const dataListener = createDataListener(processor);
+    const dataListener = createDataListener(processor, platform);
 
-    if (!stdin) return;
-
-    const stdinStream = stdin as NodeJS.ReadStream;
-    stdinStream.on("data", dataListener);
+    stdin.on?.("data", dataListener);
     return () => {
-      stdinStream.removeListener("data", dataListener);
+      // Disable Bracketed Paste Mode
+      stdout.write("\x1b[?2004l");
+      stdin.off?.("data", dataListener);
+      if (isRawModeSupported) {
+        setRawMode(false);
+      }
     };
-  }, [stdin, broadcast]);
+  }, [stdin, broadcast, kittyProtocol]);
 
   return (
     <KeypressContext.Provider value={{ subscribe, unsubscribe }}>
