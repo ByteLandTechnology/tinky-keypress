@@ -8,4 +8,4 @@
 
 > `const` **FOCUS_OUT**: "\u001b\[O" = `"\x1b[O"`
 
-Keypress Context and Provider
+Focus out sequence

@@ -8,4 +8,4 @@
 
 > `const` **FOCUS_IN**: "\u001b\[I" = `"\x1b[I"`
 
-Focus event sequences
+Focus in sequence

@@ -6,8 +6,8 @@ import {
   FAST_RETURN_TIMEOUT,
   FOCUS_IN,
   FOCUS_OUT,
-  type Key,
-} from "../src/contexts/KeypressContext.js";
+} from "../src/utils/sequences.js";
+import { type Key } from "../src/utils/keypress.js";
 
 describe("KeypressContext constants", () => {
   describe("timeout constants", () => {
