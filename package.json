@@ -1,6 +1,6 @@
 {
   "name": "tinky-keypress",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Keypress handling context and hooks for Tinky",
   "keywords": [
     "tinky",
