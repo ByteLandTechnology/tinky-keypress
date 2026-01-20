@@ -1,3 +1,9 @@
+## [1.3.0](https://github.com/ByteLandTechnology/tinky-keypress/compare/v1.2.0...v1.3.0) (2026-01-20)
+
+### ✨ Features
+
+- add raw sequence support to KeypressHandler ([2fff5a5](https://github.com/ByteLandTechnology/tinky-keypress/commit/2fff5a50a4e74ad21e9a5d1e76da037590dacdef))
+
 ## [1.2.0](https://github.com/ByteLandTechnology/tinky-keypress/compare/v1.1.0...v1.2.0) (2026-01-19)
 
 ### ✨ Features
