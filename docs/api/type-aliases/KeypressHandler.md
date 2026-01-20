@@ -6,7 +6,7 @@
 
 # Type Alias: KeypressHandler()
 
-> **KeypressHandler** = (`key`) => `void`
+> **KeypressHandler** = (`key`, `raw`) => `void`
 
 Handler function type for keypress events.
 
@@ -15,6 +15,14 @@ Handler function type for keypress events.
 ### key
 
 [`Key`](../interfaces/Key.md)
+
+The parsed key event.
+
+### raw
+
+`string`
+
+The original raw string sequence that triggered the event.
 
 ## Returns
 

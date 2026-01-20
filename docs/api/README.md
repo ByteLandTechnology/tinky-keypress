@@ -88,7 +88,7 @@ Hook to subscribe to keypress events.
 
 ```typescript
 useKeypress(
-  handler: (key: Key) => void,
+  handler: (key: Key, raw: string) => void,
   options: { isActive: boolean }
 ): void
 ```

@@ -23,7 +23,7 @@ Registers a handler function to be called when a keypress event occurs.
 
 [`KeypressHandler`](../type-aliases/KeypressHandler.md)
 
-The function to call with the parsed Key object.
+The function to call with the parsed Key object and raw sequence.
 
 #### Returns
 

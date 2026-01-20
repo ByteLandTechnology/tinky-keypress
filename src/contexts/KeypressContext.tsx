@@ -19,7 +19,7 @@ export type { Key, KeypressHandler };
 export interface KeypressContextValue {
   /**
    * Registers a handler function to be called when a keypress event occurs.
-   * @param handler - The function to call with the parsed Key object.
+   * @param handler - The function to call with the parsed Key object and raw sequence.
    */
   subscribe: (handler: KeypressHandler) => void;
   /**
@@ -64,7 +64,8 @@ export function KeypressProvider({
     [subscribers],
   );
   const broadcast = useCallback(
-    (key: Key) => subscribers.forEach((handler) => handler(key)),
+    (key: Key, raw: string) =>
+      subscribers.forEach((handler) => handler(key, raw)),
     [subscribers],
   );
 

@@ -84,7 +84,7 @@ const instance = render(
 
 ```typescript
 useKeypress(
-  handler: (key: Key) => void,
+  handler: (key: Key, raw: string) => void,
   options: { isActive: boolean }
 ): void
 ```

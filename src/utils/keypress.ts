@@ -48,19 +48,21 @@ export interface Key {
 
 /**
  * Handler function type for keypress events.
+ * @param key - The parsed key event.
+ * @param raw - The original raw string sequence that triggered the event.
  */
-export type KeypressHandler = (key: Key) => void;
+export type KeypressHandler = (key: Key, raw: string) => void;
 
 export function nonKeyboardEventFilter(
   keypressHandler: KeypressHandler,
 ): KeypressHandler {
-  return (key: Key) => {
+  return (key: Key, raw: string) => {
     if (
       !isMouseSequence(key.sequence) &&
       key.sequence !== FOCUS_IN &&
       key.sequence !== FOCUS_OUT
     ) {
-      keypressHandler(key);
+      keypressHandler(key, raw);
     }
   };
 }
@@ -75,17 +77,20 @@ export function bufferFastReturn(
   keypressHandler: KeypressHandler,
 ): KeypressHandler {
   let lastKeyTime = 0;
-  return (key: Key) => {
+  return (key: Key, raw: string) => {
     const now = Date.now();
     if (key.name === "return" && now - lastKeyTime <= FAST_RETURN_TIMEOUT) {
-      keypressHandler({
-        ...key,
-        name: "return",
-        sequence: "\r",
-        insertable: true,
-      });
+      keypressHandler(
+        {
+          ...key,
+          name: "return",
+          sequence: "\r",
+          insertable: true,
+        },
+        raw,
+      );
     } else {
-      keypressHandler(key);
+      keypressHandler(key, raw);
     }
     lastKeyTime = now;
   };
@@ -99,14 +104,21 @@ export function bufferFastReturn(
 export function bufferBackslashEnter(
   keypressHandler: KeypressHandler,
 ): KeypressHandler {
-  const bufferer = (function* (): Generator<void, void, Key | null> {
+  const bufferer = (function* (): Generator<
+    void,
+    void,
+    { key: Key; raw: string } | null
+  > {
     while (true) {
-      const key = yield;
+      const event = yield;
 
-      if (key == null) {
+      if (event == null) {
         continue;
-      } else if (key.sequence !== "\\") {
-        keypressHandler(key);
+      }
+      const { key, raw } = event;
+
+      if (key.sequence !== "\\") {
+        keypressHandler(key, raw);
         continue;
       }
 
@@ -114,27 +126,33 @@ export function bufferBackslashEnter(
         () => bufferer.next(null),
         BACKSLASH_ENTER_TIMEOUT,
       );
-      const nextKey = yield;
+      const nextEvent = yield;
       clearTimeout(timeoutId);
 
-      if (nextKey === null) {
-        keypressHandler(key);
-      } else if (nextKey.name === "return") {
-        keypressHandler({
-          ...nextKey,
-          shift: true,
-          sequence: "\r", // Corrected escaping for newline
-        });
+      if (nextEvent === null) {
+        keypressHandler(key, raw);
       } else {
-        keypressHandler(key);
-        keypressHandler(nextKey);
+        const { key: nextKey, raw: nextRaw } = nextEvent;
+        if (nextKey.name === "return") {
+          keypressHandler(
+            {
+              ...nextKey,
+              shift: true,
+              sequence: "\r", // Corrected escaping for newline
+            },
+            raw + nextRaw,
+          );
+        } else {
+          keypressHandler(key, raw);
+          keypressHandler(nextKey, nextRaw);
+        }
       }
     }
   })();
 
   bufferer.next(); // prime the generator so it starts listening.
 
-  return (key: Key) => bufferer.next(key);
+  return (key: Key, raw: string) => bufferer.next({ key, raw });
 }
 
 /**
@@ -143,49 +161,69 @@ export function bufferBackslashEnter(
  * when a null key is received.
  */
 export function bufferPaste(keypressHandler: KeypressHandler): KeypressHandler {
-  const bufferer = (function* (): Generator<void, void, Key | null> {
+  const bufferer = (function* (): Generator<
+    void,
+    void,
+    { key: Key; raw: string } | null
+  > {
     while (true) {
-      let key = yield;
+      let event = yield;
 
-      if (key === null) {
-        continue;
-      } else if (key.name !== "paste-start") {
-        keypressHandler(key);
+      if (event === null) {
         continue;
       }
 
+      const { key, raw } = event;
+
+      if (key.name !== "paste-start") {
+        keypressHandler(key, raw);
+        continue;
+      }
+
+      const rawStart = raw;
       let buffer = "";
+      let rawInner = "";
+
       while (true) {
         const timeoutId = setTimeout(() => bufferer.next(null), PASTE_TIMEOUT);
-        key = yield;
+        event = yield;
         clearTimeout(timeoutId);
 
-        if (key === null) {
+        if (event === null) {
           // Paste timeout occurred - data may be truncated
           break;
         }
 
-        if (key.name === "paste-end") {
+        const { key: nextKey, raw: nextRaw } = event;
+
+        if (nextKey.name === "paste-end") {
+          // Add paste-end raw to rawBuffer? Actually we need to emit it?
+          // The bufferPaste logic emits a single PASTE event.
+          // The raw sequence should be paste-start + inner + paste-end.
+          // So rawStart + rawInner + nextRaw.
+          if (buffer.length > 0) {
+            keypressHandler(
+              {
+                name: "paste",
+                ctrl: false,
+                meta: false,
+                shift: false,
+                insertable: true,
+                sequence: buffer,
+              },
+              rawStart + rawInner + nextRaw,
+            );
+          }
           break;
         }
-        buffer += key.sequence;
-      }
-
-      if (buffer.length > 0) {
-        keypressHandler({
-          name: "paste",
-          ctrl: false,
-          meta: false,
-          shift: false,
-          insertable: true,
-          sequence: buffer,
-        });
+        buffer += nextKey.sequence;
+        rawInner += nextRaw;
       }
     }
   })();
   bufferer.next(); // prime the generator so it starts listening.
 
-  return (key: Key) => bufferer.next(key);
+  return (key: Key, raw: string) => bufferer.next({ key, raw });
 }
 
 /**
@@ -282,14 +320,17 @@ export function* emitKeys(
           try {
             const base64Data = match[1];
             const decoded = Buffer.from(base64Data, "base64").toString("utf-8");
-            keypressHandler({
-              name: "paste",
-              ctrl: false,
-              meta: false,
-              shift: false,
-              insertable: true,
-              sequence: decoded,
-            });
+            keypressHandler(
+              {
+                name: "paste",
+                ctrl: false,
+                meta: false,
+                shift: false,
+                insertable: true,
+                sequence: decoded,
+              },
+              sequence + buffer,
+            );
           } catch {
             // Ignore error
           }
@@ -495,14 +536,17 @@ export function* emitKeys(
       meta = true;
 
       // Emit first escape key here, then continue processing
-      keypressHandler({
-        name: "escape",
-        ctrl,
-        meta,
-        shift,
-        insertable: false,
-        sequence: ESC,
-      });
+      keypressHandler(
+        {
+          name: "escape",
+          ctrl,
+          meta,
+          shift,
+          insertable: false,
+          sequence: ESC,
+        },
+        ESC,
+      );
     } else if (escaped) {
       // Escape sequence timeout
       name = ch.length ? undefined : "escape";
@@ -516,14 +560,17 @@ export function* emitKeys(
       (sequence.length !== 0 && (name !== undefined || escaped)) ||
       charLengthAt(sequence, 0) === sequence.length
     ) {
-      keypressHandler({
-        name: name || "",
-        ctrl,
-        meta,
-        shift,
-        insertable,
+      keypressHandler(
+        {
+          name: name || "",
+          ctrl,
+          meta,
+          shift,
+          insertable,
+          sequence,
+        },
         sequence,
-      });
+      );
     }
     // Unrecognized or broken escape sequence, don't emit anything
   }
